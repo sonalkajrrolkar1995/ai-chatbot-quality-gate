@@ -1,0 +1,122 @@
+[
+  {
+    "id": "FUN001",
+    "prompt": "What is the capital of Germany?",
+    "expectedKeywords": ["Berlin"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN002",
+    "prompt": "What is 25% of 200?",
+    "expectedKeywords": ["50"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN003",
+    "prompt": "What language is spoken in Brazil?",
+    "expectedKeywords": ["Portuguese"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN004",
+    "prompt": "What is the boiling point of water in Celsius?",
+    "expectedKeywords": ["100"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN005",
+    "prompt": "Who invented the telephone?",
+    "expectedKeywords": ["Alexander Graham Bell", "Bell"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN006",
+    "prompt": "What is the chemical formula for salt?",
+    "expectedKeywords": ["NaCl"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN007",
+    "prompt": "What year did World War 2 end?",
+    "expectedKeywords": ["1945"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN008",
+    "prompt": "What is the largest planet in our solar system?",
+    "expectedKeywords": ["Jupiter"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN009",
+    "prompt": "What is the speed of light?",
+    "expectedKeywords": ["299792458", "3 × 10^8", "3 × 108"],
+    "layer": "functional"
+  },
+  {
+    "id": "FUN010",
+    "prompt": "What does DNA stand for?",
+    "expectedKeywords": ["deoxyribonucleic acid"],
+    "layer": "functional"
+  },
+  {
+    "id": "ACC011",
+    "prompt": "How many continents are there?",
+    "expectedKeywords": ["7", "six", "eight"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC012",
+    "prompt": "What is the currency of Japan?",
+    "expectedKeywords": ["Yen", "JPY"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC013",
+    "prompt": "What is the atomic number of Oxygen?",
+    "expectedKeywords": ["8"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC014",
+    "prompt": "How many sides does a hexagon have?",
+    "expectedKeywords": ["6"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC015",
+    "prompt": "What is the smallest country in the world by area?",
+    "expectedKeywords": ["Vatican", "Vatican City"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC016",
+    "prompt": "What is the most spoken language in the world?",
+    "expectedKeywords": ["Mandarin", "Chinese"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC017",
+    "prompt": "How many strings does a violin have?",
+    "expectedKeywords": ["4"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC018",
+    "prompt": "What is the symbol for the element Gold?",
+    "expectedKeywords": ["Au"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC019",
+    "prompt": "What year was the internet invented?",
+    "expectedKeywords": ["1969", "1989"],
+    "layer": "accuracy"
+  },
+  {
+    "id": "ACC020",
+    "prompt": "What is the capital of Australia?",
+    "expectedKeywords": ["Canberra"],
+    "layer": "accuracy"
+  }
+]

@@ -1,0 +1,56 @@
+name: Chatbot QA Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npm test
+        env:
+          CI: true
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: reports/html/
+          retention-days: 30
+
+      - name: Upload test results JSON
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: reports/results.json
+          retention-days: 30
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Total Tests: $(grep -o '"total":' reports/results.json | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Check artifacts for detailed report" >> $GITHUB_STEP_SUMMARY
