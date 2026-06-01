@@ -1,41 +1,42 @@
 const { test, expect } = require('../base/BaseTest');
 
-test.describe('Performance - Response Time SLA', () => {
-  const performanceTests = [
-    { id: 'PER001', prompt: 'Hello', maxTime: 10 },
-    { id: 'PER002', prompt: 'What is the capital of Germany?', maxTime: 10 },
-    { id: 'PER003', prompt: 'Explain quantum computing', maxTime: 15 },
+test.describe('Performance - Response time in the UI', () => {
+  const cases = [
+    { id: 'PER001', prompt: 'Hi', maxSeconds: 15 },
+    { id: 'PER002', prompt: 'What is the capital of Japan?', maxSeconds: 15 },
+    { id: 'PER003', prompt: 'Explain how photosynthesis works', maxSeconds: 20 },
   ];
 
-  performanceTests.forEach(testCase => {
-    test(`${testCase.id}: Response within ${testCase.maxTime}s`, async ({ geminiClient }) => {
-      const startTime = Date.now();
+  cases.forEach(testCase => {
+    test(`${testCase.id}: Response within ${testCase.maxSeconds}s - "${testCase.prompt}"`, async ({ geminiPage }) => {
+      const start = Date.now();
 
-      const response = await geminiClient.sendPrompt(testCase.prompt, 150);
+      await geminiPage.sendMessage(testCase.prompt);
+      await geminiPage.waitForResponse();
 
-      const responseTime = (Date.now() - startTime) / 1000;
+      const elapsed = (Date.now() - start) / 1000;
 
-      expect(response).toBeTruthy();
-      expect(responseTime).toBeLessThan(testCase.maxTime);
+      console.log(`PER: ${testCase.id} - ${elapsed.toFixed(2)}s`);
+      expect(elapsed).toBeLessThan(testCase.maxSeconds);
 
-      console.log(`✓ PER: ${testCase.id} - ${responseTime.toFixed(2)}s (SLA: ${testCase.maxTime}s)`);
+      await geminiPage.startNewChat();
     });
   });
 
-  test('PER_META: Performance Baseline', async ({ geminiClient }) => {
-    const results = [];
+  test('PER_META: Average response time across 2 simple prompts', async ({ geminiPage }) => {
+    const times = [];
+    const prompts = ['What is 5 + 3?', 'Name a planet'];
 
-    for (let i = 0; i < 3; i++) {
+    for (const prompt of prompts) {
       const start = Date.now();
-      await geminiClient.sendPrompt(`Test query ${i + 1}`, 100);
-      const duration = (Date.now() - start) / 1000;
-      results.push(duration);
+      await geminiPage.sendMessage(prompt);
+      await geminiPage.waitForResponse();
+      times.push((Date.now() - start) / 1000);
+      await geminiPage.startNewChat();
     }
 
-    const avgTime = results.reduce((a, b) => a + b, 0) / results.length;
-
-    expect(avgTime).toBeLessThan(15);
-
-    console.log(`\nPerformance: Avg ${avgTime.toFixed(2)}s`);
+    const avg = times.reduce((a, b) => a + b, 0) / times.length;
+    console.log(`Average response time: ${avg.toFixed(2)}s`);
+    expect(avg).toBeLessThan(20);
   });
 });

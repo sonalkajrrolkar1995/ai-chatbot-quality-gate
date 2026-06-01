@@ -1,22 +1,22 @@
 const { test, expect } = require('../base/BaseTest');
 const goldenPrompts = require('../../test-data/golden-prompts.json');
 
-test.describe('Accuracy - Golden Dataset Validation', () => {
-  const accuracyTests = goldenPrompts.filter(t => t.layer === 'accuracy').slice(0, 5);
+test.describe('Accuracy - Factual correctness', () => {
+  const prompts = goldenPrompts.filter(t => t.layer === 'accuracy').slice(0, 5);
 
-  accuracyTests.forEach(testCase => {
-    test(`${testCase.id}: ${testCase.prompt}`, async ({ geminiClient }) => {
-      const response = await geminiClient.sendPrompt(testCase.prompt, 150);
+  prompts.forEach(testCase => {
+    test(`${testCase.id}: ${testCase.prompt}`, async ({ geminiPage }) => {
+      await geminiPage.sendMessage(testCase.prompt);
+      await geminiPage.waitForResponse();
 
-      expect(response).toBeTruthy();
+      const response = await geminiPage.getLastResponseText();
 
-      const matchesExpected = testCase.expectedKeywords.some(keyword =>
-        response.toLowerCase().includes(keyword.toLowerCase())
+      const correct = testCase.expectedKeywords.some(kw =>
+        response.toLowerCase().includes(kw.toLowerCase())
       );
+      expect(correct, `Expected one of: ${testCase.expectedKeywords.join(', ')}\nGot: ${response.slice(0, 200)}`).toBe(true);
 
-      expect(matchesExpected, `Response should contain: ${testCase.expectedKeywords.join(', ')}`).toBe(true);
-
-      console.log(`✓ ACC: ${testCase.id}`);
+      await geminiPage.startNewChat();
     });
   });
 });

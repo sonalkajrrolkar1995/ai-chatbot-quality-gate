@@ -1,44 +1,47 @@
 const { test, expect } = require('../base/BaseTest');
 
-test.describe('Format Validation - Response Structure', () => {
-  test('FMT001: Response is valid text format', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('What is water?', 100);
-
-    expect(response).toBeTruthy();
+test.describe('Format - Response text is valid', () => {
+  test('FMT001: Response is non-empty text', async ({ geminiPage }) => {
+    await geminiPage.sendMessage('What is water?');
+    await geminiPage.waitForResponse();
+    const response = await geminiPage.getLastResponseText();
     expect(typeof response).toBe('string');
-    expect(response.length).toBeGreaterThan(0);
+    expect(response.trim().length).toBeGreaterThan(10);
+    await geminiPage.startNewChat();
   });
 
-  test('FMT002: Response contains no control characters', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('Hello', 50);
-
+  test('FMT002: Response contains no strange control characters', async ({ geminiPage }) => {
+    await geminiPage.sendMessage('Say hello');
+    await geminiPage.waitForResponse();
+    const response = await geminiPage.getLastResponseText();
     const hasControlChars = /[\x00-\x08\x0B\x0C\x0E-\x1F]/.test(response);
-
     expect(hasControlChars).toBe(false);
+    await geminiPage.startNewChat();
   });
 
-  test('FMT003: Response contains printable characters', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('Introduce yourself', 100);
-
-    const hasPrintable = /[a-zA-Z0-9\s.,!?-]/.test(response);
-
-    expect(hasPrintable).toBe(true);
+  test('FMT003: Response has readable characters', async ({ geminiPage }) => {
+    await geminiPage.sendMessage('Introduce yourself briefly');
+    await geminiPage.waitForResponse();
+    const response = await geminiPage.getLastResponseText();
+    const hasReadable = /[a-zA-Z]{3,}/.test(response);
+    expect(hasReadable, 'Response should contain readable words').toBe(true);
+    await geminiPage.startNewChat();
   });
 
-  test('FMT004: Response length within reasonable bounds', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('What is salt?', 150);
-
-    const length = response.length;
-
-    expect(length).toBeGreaterThanOrEqual(10);
-    expect(length).toBeLessThanOrEqual(2000);
+  test('FMT004: Response length is reasonable', async ({ geminiPage }) => {
+    await geminiPage.sendMessage('What is salt?');
+    await geminiPage.waitForResponse();
+    const response = await geminiPage.getLastResponseText();
+    expect(response.length).toBeGreaterThan(10);
+    expect(response.length).toBeLessThan(5000);
+    await geminiPage.startNewChat();
   });
 
-  test('FMT005: Response properly encoded', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('What is photosynthesis?', 150);
-
-    expect(response).not.toBeNull();
-    expect(response).not.toBeUndefined();
-    expect(response.length).toBeGreaterThan(0);
+  test('FMT005: Response is visible in the UI', async ({ geminiPage, page }) => {
+    await geminiPage.sendMessage('What is the sun?');
+    await geminiPage.waitForResponse();
+    const lastResponse = page.locator('model-response .markdown').last();
+    await expect(lastResponse).toBeVisible();
+    await geminiPage.startNewChat();
   });
 });

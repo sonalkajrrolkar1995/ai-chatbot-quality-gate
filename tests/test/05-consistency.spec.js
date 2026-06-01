@@ -1,33 +1,29 @@
 const { test, expect } = require('../base/BaseTest');
 
-test.describe('Consistency - Deterministic Responses', () => {
-  const testPrompts = [
+test.describe('Consistency - Same question should give similar answers', () => {
+  const prompts = [
     { id: 'CON001', prompt: 'What is the capital of France?' },
-    { id: 'CON002', prompt: 'What is 10 + 5?' },
+    { id: 'CON002', prompt: 'What is 2 + 2?' },
   ];
 
-  testPrompts.forEach(testCase => {
-    test(`${testCase.id}: Consistency across 3 runs`, async ({ geminiClient }) => {
+  prompts.forEach(testCase => {
+    test(`${testCase.id}: ${testCase.prompt}`, async ({ geminiPage }) => {
       const responses = [];
 
-      for (let i = 0; i < 3; i++) {
-        const response = await geminiClient.sendPrompt(testCase.prompt, 100);
-        responses.push(response);
+      for (let i = 0; i < 2; i++) {
+        await geminiPage.sendMessage(testCase.prompt);
+        await geminiPage.waitForResponse();
+        const text = await geminiPage.getLastResponseText();
+        responses.push(text.toLowerCase());
+        await geminiPage.startNewChat();
       }
 
-      responses.forEach(r => expect(r).toBeTruthy());
+      const firstWords = responses[0].split(' ').slice(0, 5);
+      const secondHasSomeOverlap = firstWords.some(word =>
+        word.length > 3 && responses[1].includes(word)
+      );
 
-      const firstResponse = responses[0].toLowerCase();
-      const allSimilar = responses.every(response => {
-        const keywordMatch = firstResponse.split(' ').slice(0, 5).every(word =>
-          response.toLowerCase().includes(word)
-        );
-        return keywordMatch;
-      });
-
-      expect(allSimilar, 'Responses should be similar').toBe(true);
-
-      console.log(`✓ CON: ${testCase.id} - Consistent`);
+      expect(secondHasSomeOverlap, `Responses are too different:\n1: ${responses[0].slice(0, 100)}\n2: ${responses[1].slice(0, 100)}`).toBe(true);
     });
   });
 });

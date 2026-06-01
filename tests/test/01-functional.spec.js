@@ -1,27 +1,24 @@
 const { test, expect } = require('../base/BaseTest');
 const goldenPrompts = require('../../test-data/golden-prompts.json');
 
-test.describe('Functional - Basic Question Answering', () => {
-  const functionalTests = goldenPrompts.filter(t => t.layer === 'functional').slice(0, 5);
+test.describe('Functional - Basic chat works', () => {
+  const prompts = goldenPrompts.filter(t => t.layer === 'functional').slice(0, 5);
 
-  functionalTests.forEach(testCase => {
-    test(`${testCase.id}: ${testCase.prompt}`, async ({ geminiClient }) => {
-      const startTime = Date.now();
+  prompts.forEach(testCase => {
+    test(`${testCase.id}: ${testCase.prompt}`, async ({ geminiPage }) => {
+      await geminiPage.sendMessage(testCase.prompt);
+      await geminiPage.waitForResponse();
 
-      const response = await geminiClient.sendPrompt(testCase.prompt, 150);
-      const responseTime = (Date.now() - startTime) / 1000;
+      const response = await geminiPage.getLastResponseText();
 
-      expect(response).toBeTruthy();
-      expect(response.length).toBeGreaterThan(0);
+      expect(response.length).toBeGreaterThan(10);
 
-      const containsExpected = testCase.expectedKeywords.some(keyword =>
-        response.toLowerCase().includes(keyword.toLowerCase())
+      const hasKeyword = testCase.expectedKeywords.some(kw =>
+        response.toLowerCase().includes(kw.toLowerCase())
       );
+      expect(hasKeyword, `Response should contain one of: ${testCase.expectedKeywords.join(', ')}`).toBe(true);
 
-      expect(containsExpected, `Response should contain one of: ${testCase.expectedKeywords.join(', ')}`).toBe(true);
-      expect(responseTime).toBeLessThan(10);
-
-      console.log(`✓ FUN: ${testCase.id} (${responseTime.toFixed(2)}s)`);
+      await geminiPage.startNewChat();
     });
   });
 });

@@ -1,18 +1,19 @@
 const { test, expect } = require('../base/BaseTest');
 
-test.describe('Setup - Environment Verification', () => {
-  test('ENV001: Gemini API key is configured', async ({ geminiClient }) => {
-    expect(process.env.GEMINI_API_KEY).toBeTruthy();
+test.describe('Setup - Gemini UI loads correctly', () => {
+  test('ENV001: Gemini page opens and chat input is visible', async ({ geminiPage, page }) => {
+    await expect(page).toHaveURL(/gemini\.google\.com/);
+    await expect(geminiPage.chatInput).toBeVisible();
   });
 
-  test('ENV002: Gemini API connection works', async ({ geminiClient }) => {
-    const isConnected = await geminiClient.testConnection();
-    expect(isConnected).toBe(true);
+  test('ENV002: Send button is present', async ({ geminiPage }) => {
+    await geminiPage.chatInput.fill('Hello');
+    await expect(geminiPage.sendButton).toBeVisible();
   });
 
-  test('ENV003: Can send simple prompt', async ({ geminiClient }) => {
-    const response = await geminiClient.sendPrompt('Say hello', 50);
-    expect(response).toBeTruthy();
-    expect(response.length).toBeGreaterThan(0);
+  test('ENV003: Can type into the chat input', async ({ geminiPage }) => {
+    await geminiPage.chatInput.fill('Test input');
+    const value = await geminiPage.chatInput.innerText();
+    expect(value).toContain('Test input');
   });
 });
